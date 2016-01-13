@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<!--
+  * Please see the included README.md file for license terms and conditions.
+  -->
+<head>
+    <title>MyHouse</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style>
+        /* following two viewport lines are equivalent to the meta viewport statement above, needed for Windows */
+        /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
+        @-ms-viewport { width: 100vw ; zoom: 100% ; }  @viewport { width: 100vw ; zoom: 100% ; }
+        @-ms-viewport { user-zoom: fixed ; }           @viewport { user-zoom: fixed ; }
+    </style>
+
+    <script src="cordova.js"></script>          <!-- phantom library, needed for Cordova api calls, added during build -->
+          <!-- recommended location of your JavaScript code relative to other JS files -->
+         <!-- normalizes device and document ready events, see README for details -->
+    <link rel="stylesheet" href="css/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="css/onsenui/css/onsen-css-components-blue-basic-theme.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300italic,300,100italic,400italic,500,700,500italic,700italic,900,900italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/app.css">
+    
+    
+     <script src="js/onsenui/js/onsenui.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    
+   
+    
+    
+    <script src="js/onsenui/js/angular-onsenui.min.js"></script>
+    
+    
+    <script src="js/angular-resource.min.js"></script>
+    <script src="js/angular-animate.min.js"></script>
+    
+    
+ <script type='text/javascript' src='js/loading-bar.js'></script>
+    
+   
+    
+    <script src="js/app.js"></script> 
+    <script src="xdk/init-dev.js"></script>
+    
+    
+    <script type="text/ons-template" id="alert.html">
+      <ons-alert-dialog class="alert-dialog--material" animation="default">
+        <div class="alert-dialog-title alert-dialog-title--material">Cargando...</div>
+        <div class="alert-dialog-content alert-dialog-content--material">
+          <div class="progress-bar progress-bar--indeterminate"></div>
+        </div>
+        <div class="alert-dialog-footer alert-dialog-footer--material">
+          
+        </div>
+      </ons-alert-dialog>
+    </script>
+
+</head>
+
+
+<body ng-controller="UserController" id="UserController">
+
+    <ons-template id="page.html">
+        
+<!--        //login page-->
+        <ons-page >
+            <ons-navigator animation="slide" var="app.navi">
+                <ons-toolbar modifier="material" class="inbox-interface">
+                    <div class="left" modifier="material"></div>
+                    <div class="center" modifier="material">MyHouse</div>
+                    <div class="right" modifier="material">
+                        <ons-toolbar-button modifier="material"></ons-toolbar-button>
+                    </div>
+                </ons-toolbar>
+                <div class="login-form">
+                    <div style="width:100%;display: inline-block;">
+                        <div style="float:left;width:20%">
+                            <i class="material-icons">email</i>
+                        </div>
+                        <div style="float:left;width:80%">
+                            <ons-material-input style="width:100%" ng-model="user.username" label="Email" type="email" ></ons-material-input>
+                        </div>
+                    </div >
+                    <br>
+                    <br>
+                    <br>
+                    <div style="width:100%;display: inline-block;">
+                        <div style="float:left;width:20%">
+                            <i class="material-icons">vpn_key</i>
+                        </div>
+                        <div style="float:left;width:80%">
+                            <ons-material-input  type="password" label="Contraseña" ng-model="user.password" ng-enter="login()" style="width:100%" ></ons-material-input>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <ons-button modifier="large" ng-click="login()" class="login-button">Log In</ons-button>
+                    <br>
+                    <ons-button modifier="quiet" ng-click="prompt(true)" class="forgot-password">Recuperar contraseña</ons-button>
+                    
+                    
+<!--
+                    
+                    
+                    <ons-button  ng-click="app.navi.pushPage('page1.html');"  class="">Change</ons-button>
+-->
+                    
+                    
+                    
+                </div>
+            </ons-navigator>  
+        </ons-page>
+    </ons-template>
+
+            <ons-sliding-menu main-page="page.html" menu-page="menu.html" swipeable="false" max-slide-distance="260px" type="push" var="app.menu"></ons-sliding-menu>
+
+    
+    
+    
+
+ 
+    
+
+    
+<ons-template id="new_payment.html">
+  <ons-dialog var="dialog" cancelable>
+
+    <ons-toolbar inline>
+      <div class="center">
+        Pago
+      </div>
+    </ons-toolbar>
+    <div style="width:90%;padding:12px;">
+    <p>
+      <ons-material-input ng-model="payment.new.amount" label="Cantidad" type="number" style="width:100%" ></ons-material-input>
+    </p>
+    <p>
+      <ons-material-input ng-model="payment.new.comments" label="Descripción" type="text" style="width:100%"></ons-material-input>
+    </p>
+
+    <p>
+      <ons-material-input ng-model="payment.new.date" label="Fecha" type="date" style="width:100%" ></ons-material-input>
+    </p>
+
+    <p>
+      <ons-button modifier="outline" ng-click="dialog.hide();payment.new.loan_id='';payment.new.amount = '';payment.new.comments = '';payment.new.date = ''; ">Cancelar</ons-button>
+      <ons-button modifier="" ng-click="newPayment(dialog);">Guardar</ons-button>
+    </p>
+    </div>
+  </ons-dialog>
+</ons-template>    
+    
+<ons-template id="new_loan.html">
+  <ons-dialog var="dialog" cancelable>
+
+    <ons-toolbar inline>
+      <div class="center">
+        Nuevo Prestamo
+      </div>
+    </ons-toolbar>
+    <div style="width:90%;padding:12px;">
+     <p>
+      <select ng-options="model.id as model.name for model in users" ng-model="loan.new.borrower_id" placeholder="Solicitante" style="width:100%" ></select>
+    </p>
+    <p>
+      <ons-material-input ng-model="loan.new.amount" label="Cantidad" type="number" style="width:100%" ></ons-material-input>
+    </p>
+    <p>
+      <ons-material-input ng-model="loan.new.description" label="Descripción" type="text" style="width:100%"></ons-material-input>
+    </p>
+
+    <p>
+      <ons-material-input ng-model="loan.new.date" label="Fecha" type="date" style="width:100%" ></ons-material-input>
+    </p>
+
+    <p>
+      <ons-button modifier="outline" ng-click="dialog.hide();loan.new.borrower_id='';loan.new.amount = '';loan.new.description = '';loan.new.date = ''; ">Cancelar</ons-button>
+      <ons-button modifier="" ng-click="newLoan(dialog);">Guardar</ons-button>
+    </p>
+    </div>
+  </ons-dialog>
+</ons-template>   
+    
+    
+ 
+
+<ons-template id="prestamos.html">
+    
+                
+    <!-- Prestamos recibidos -->
+    <ons-list class="contact-block" ng-class="{hide: !(loans.yourLoans.length>0)}" modifier="material">
+        <ons-list-item modifier="material" class="contact-block-li contact-block-header">
+            <div class="contact-from">
+                <span class="contact-block-item-title contact-interface-text">
+                    <ons-icon icon="md-card"></ons-icon>  Prestamos recibidos 
+                </span>
+            </div>
+        </ons-list-item>
+        <ons-list-item modifier="chevron" class="plan" ng-repeat="loan in loans.yourLoans">
+            <ons-row style="height: 63px">
+                <ons-col width="140px" class="plan-left">
+                    <div class="plan-date">Por: {{loan.amount | currency : '$' : 2}}</div>
+                    <div class="plan-duration">Edeudo: {{loan.owe | currency : '$' : 2}}</div>
+                </ons-col>
+                <ons-col width="6px" class="plan-center" style="background-color:darkorange">
+                </ons-col>
+                <ons-col class="plan-right">
+                    <div class="plan-name">{{loan.description}}</div>
+                    <div class="plan-info">
+                        <div>
+                            <ons-icon icon="md-account-box-o"></ons-icon>  {{loan.lender}}
+                        </div>
+                    </div>
+                </ons-col>
+            </ons-row>
+        </ons-list-item>
+        </ons-list-item>
+    </ons-list>
+                
+    <!-- Prestamos dados -->
+    <ons-list class="contact-block" ng-class="{hide: !(loans.yourLoans.length>0)}" modifier="material">
+        <ons-list-item modifier="material" class="contact-block-li contact-block-header">
+            <div class="contact-from">
+                <span class="contact-block-item-title contact-interface-text">
+                    <ons-icon icon="md-card"></ons-icon>  Prestamos dados
+                </span>
+            </div>
+        </ons-list-item>
+        <ons-list-item modifier="chevron" class="plan" ng-repeat="loan in loans.myLoans">
+            
+            <ons-carousel swipeable style="height: 63px; width: 100%;" initial-index="1" auto-scroll>
+                <ons-carousel-item class="list-action-menu">
+                    <ons-button class="btn-danger" ng-click="deleteLoan(loan.id)" >
+                        <ons-ripple></ons-ripple>
+                        <ons-icon icon="md-delete" size="40px" class="icon-danger">
+                    </ons-button>
+                    <ons-button class="btn-success" ng-click=" payment.new.loan_id = loan.id; show('new_payment.html') ">
+                        <ons-ripple></ons-ripple>
+                        <ons-icon icon="md-plus-square" size="40px" class="icon-success">
+                    </ons-button>
+                </ons-carousel-item>
+                <ons-carousel-item class="list-action-item">      
+                    <ons-row>
+                        <ons-col width="128px" class="plan-left">
+                            <div class="plan-date">Por: {{loan.amount | currency : '$' : 2}}</div>
+                            <div class="plan-duration">Edeudo: {{loan.owe | currency : '$' : 2}}</div>
+                        </ons-col>
+                        <ons-col width="6px" class="plan-center" style="background-color:darkgreen">
+                        </ons-col>
+                        <ons-col class="plan-right">
+                            <div class="plan-name">{{loan.description}}</div>
+                            <div class="plan-info">
+                                <div>
+                                    <ons-icon icon="md-account-box-o"></ons-icon>  {{loan.borrower}}
+                                </div>
+                            </div>
+                        </ons-col>
+                    </ons-row>
+                </ons-carousel-item> 
+            </ons-carousel> 
+        </ons-list-item>
+                
+    </ons-list>
+            
+    <ons-speed-dial position="right bottom" ng-click="show('new_loan.html')" >
+        <ons-ripple></ons-ripple>
+        <ons-icon icon="md-plus" size="26px" fixed-width="false" style="vertical-align:middle;"></ons-icon>
+    </ons-speed-dial>       
+            
+</ons-template>
+    
+<ons-template id="new_saving.html">
+  <ons-dialog var="dialog" cancelable>
+
+    <ons-toolbar inline>
+      <div class="center">
+        Nuevo Ahorro
+      </div>
+    </ons-toolbar>
+    <div style="width:90%;padding:12px;">
+    <p>
+      <ons-material-input ng-model="saving.new.comments" label="Descripción" type="text" style="width:100%"></ons-material-input>
+    </p>
+
+    <p>
+      <ons-material-input ng-model="saving.new.date" label="Fecha" type="date" style="width:100%" ></ons-material-input>
+    </p>
+
+    <p>
+      <ons-button modifier="outline" ng-click="dialog.hide();saving.new.comments = '';saving.new.date = ''; ">Cancelar</ons-button>
+      <ons-button modifier="" ng-click="newSaving(dialog);">Guardar</ons-button>
+    </p>
+    </div>
+  </ons-dialog>
+</ons-template>
+    
+<ons-template id="new_deposit.html">
+  <ons-dialog var="dialog" cancelable>
+
+    <ons-toolbar inline>
+      <div class="center">
+        {{deposit.new.title}}
+      </div>
+    </ons-toolbar>
+    <div style="width:90%;padding:12px;">
+    <p>
+      <ons-material-input ng-model="deposit.new.amount" label="Cantidad" type="number" style="width:100%" ></ons-material-input>
+    </p>
+    <p>
+      <ons-material-input ng-model="deposit.new.comments" label="Descripción" type="text" style="width:100%"></ons-material-input>
+    </p>
+
+    <p>
+      <ons-material-input ng-model="deposit.new.date" label="Fecha" type="date" style="width:100%" ></ons-material-input>
+    </p>
+
+    <p>
+      <ons-button modifier="outline" ng-click="dialog.hide();deposit.new.type='';deposit.new.saving_id='';deposit.new.amount = '';deposit.new.comments = '';deposit.new.date = ''; ">Cancelar</ons-button>
+      <ons-button modifier="" ng-click="newDeposit(dialog);">Guardar</ons-button>
+    </p>
+    </div>
+  </ons-dialog>
+</ons-template>
+        
+        
+<ons-template id="ahorros.html">
+    
+
+    <!-- Ahorros -->
+    <ons-list class="contact-block" modifier="material">
+        <ons-list-item modifier="material" class="contact-block-li contact-block-header">
+            <div class="contact-from">
+                <span class="contact-block-item-title contact-interface-text">
+                    <ons-icon icon="md-money"></ons-icon>  Ahorros
+                </span>
+            </div>
+        </ons-list-item>
+        <ons-list-item modifier="chevron" class="plan" ng-repeat="saving in savings">
+            
+            
+            <ons-carousel swipeable style="height: 63px; width: 100%;" initial-index="1" auto-scroll>
+                <ons-carousel-item class="list-action-menu">
+                    <ons-button class="btn-danger" ng-click="deleteSaving(saving.Saving.id)" >
+                        <ons-ripple></ons-ripple>
+                        <ons-icon icon="md-delete" size="40px" class="icon-danger">
+                    </ons-button>
+                    <ons-button class="btn-success" ng-click="deposit.new.title='Depósito'; deposit.new.saving_id = saving.Saving.id; deposit.new.type = 'deposit'; show('new_deposit.html') ">
+                        <ons-ripple></ons-ripple>
+                        <ons-icon icon="md-plus-square" size="40px" class="icon-success">
+                    </ons-button>
+                    <ons-button class="btn-warning" ng-click="deposit.new.title='Retiro'; deposit.new.saving_id = saving.Saving.id; deposit.new.type = '
+retirement'; show('new_deposit.html') ">
+                        <ons-ripple></ons-ripple>
+                        <ons-icon icon="md-minus-square" size="40px" class="icon-warning">
+                    </ons-button>
+                </ons-carousel-item>
+            
+            
+            
+                <ons-carousel-item class="list-action-item">
+            
+                    <ons-row>
+                        <ons-col width="100px" class="plan-left">
+                            <div class="plan-date">Total:</div>
+                            <div class="plan-duration" style="color:darkgreen">{{saving.Deposit | total:'amount'}}</div>
+                        </ons-col>
+                        <ons-col width="6px" class="plan-center" style="background-color:darkgreen">
+                        </ons-col>
+                        <ons-col class="plan-right">
+                            <div class="plan-name">
+                                {{saving.Saving.comments}}
+                            </div>
+                            <div class="plan-info">
+                                <div>
+                                    <ons-icon icon="md-calendar"></ons-icon>                           {{saving.Saving.date}}
+                                </div>
+                            </div>
+                        </ons-col>
+                    </ons-row>
+              
+              
+              
+               </ons-carousel-item>
+            </ons-carousel>
+        </ons-list-item>                
+         
+    </ons-list>
+                              
+    <ons-speed-dial position="right bottom" ng-click="show('new_saving.html')" >
+        <ons-ripple></ons-ripple>
+        <ons-icon icon="md-plus" size="26px" fixed-width="false" style="vertical-align:middle;"></ons-icon>
+    </ons-speed-dial>
+</ons-template>
+
+<ons-template id="gastos.html">
+    <br>
+    <br>
+    <br>
+  <div class="navigation-bar">
+  <div class="navigation-bar__center navigation-bar__title">Working...</div> 
+</div>
+</ons-template>
+    
+<!--    loged page-->
+    <ons-template id="page1.html">
+        <ons-page>
+            <ons-toolbar modifier="material" class="inbox-interface">
+                <div class="left" modifier="material">
+                    <ons-toolbar-button modifier="material" ng-click="app.menu.toggleMenu()">
+                        <ons-icon icon="ion-navicon" size="28px" fixed-width="false"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center" modifier="material">MyHouse</div>
+                <div class="right" modifier="material">
+                    <ons-toolbar-button modifier="material" ng-click="load();">
+                        <ons-icon icon="ion-loop" size="28px" fixed-width="false"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+            </ons-toolbar>
+            
+            
+            
+            <ons-tabbar position="top" modifier="material">
+                
+                <ons-tab page="ahorros.html" label="Ahorros" modifier="material" active="true"></ons-tab>
+                <ons-tab page="prestamos.html" label="Prestamos" modifier="material"></ons-tab>
+                <ons-tab page="gastos.html" label="Gastos" modifier="material"></ons-tab>
+            </ons-tabbar>
+            
+        </ons-page>
+    </ons-template>
+
+<!--    //menu page-->
+    <ons-template id="menu.html">
+        <ons-page modifier="menu-page">
+            <ons-toolbar modifier="transparent">
+                <div class="right">
+                    <ons-toolbar-button class="menu-closeMenu" ng-click="app.menu.closeMenu()">
+                        <ons-icon icon="md-close" size="20px" fixed-width="false" style="color:white"></ons-icon
+                    </ons-toolbar-button>
+                </div>
+            </ons-toolbar>
+              <ons-list class="bottom-menu-list">
+                <ons-list-item class="bottom-menu-item">
+                    <ons-icon icon="md-account-box" size="20px" fixed-width="false" style=""></ons-icon>
+                    <span>{{user_loaded.name + ' ' + user_loaded.first_last_name}}</span>
+                </ons-list-item>
+                <ons-list-item class="bottom-menu-item">Notificaciones Email
+                  <ons-switch ng-change="setNotification()" ng-model="user_loaded.notifications" modifier="list-item"></ons-switch>
+                </ons-list-item>
+                <ons-list-item class="bottom-menu-item">Notificaciones App
+                  <ons-switch ng-change="setNotification()" ng-model="user_loaded.notifications_app" modifier="list-item"></ons-switch>
+                </ons-list-item>
+                <ons-list-item class="bottom-menu-item" ng-click="sendState()">
+                    <ons-icon icon="md-mail-send" size="20px" fixed-width="false" style=""></ons-icon> Detalle (por Email) 
+                </ons-list-item>
+                <ons-list-item class="bottom-menu-item" ng-click="logout()">
+                    <ons-icon icon="md-power" size="20px" fixed-width="false" style=""></ons-icon> Salir 
+                </ons-list-item>
+              </ons-list>
+              
+        </ons-page>
+    </ons-template>
+</body>
+</html>
